@@ -9,7 +9,14 @@ from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
 
 from app.domain.errors import InvalidActivityError
-from app.domain.status import CostStatus, ScheduleStatus, classify_cost, classify_schedule
+from app.domain.status import (
+    CostStatus,
+    PerformanceBand,
+    ScheduleStatus,
+    classify_band,
+    classify_cost,
+    classify_schedule,
+)
 
 PERCENT_BASE = Decimal(100)
 MIN_PERCENT = Decimal(0)
@@ -61,6 +68,8 @@ class EvmIndicators:
     variance_at_completion: Decimal | None
     cost_status: CostStatus
     schedule_status: ScheduleStatus
+    cost_band: PerformanceBand
+    schedule_band: PerformanceBand
 
 
 def calculate_activity_indicators(activity: ActivityProgress) -> EvmIndicators:
@@ -109,6 +118,8 @@ def _build_indicators(
         if estimate_at_completion is None
         else _round_money(budget_at_completion - estimate_at_completion)
     )
+    cost_performance_index = _round_index(_safe_ratio(earned_value, actual_cost))
+    schedule_performance_index = _round_index(_safe_ratio(earned_value, planned_value))
     return EvmIndicators(
         budget_at_completion=budget_at_completion,
         planned_value=planned_value,
@@ -116,14 +127,16 @@ def _build_indicators(
         actual_cost=actual_cost,
         cost_variance=earned_value - actual_cost,
         schedule_variance=earned_value - planned_value,
-        cost_performance_index=_round_index(_safe_ratio(earned_value, actual_cost)),
-        schedule_performance_index=_round_index(_safe_ratio(earned_value, planned_value)),
+        cost_performance_index=cost_performance_index,
+        schedule_performance_index=schedule_performance_index,
         estimate_at_completion=(
             None if estimate_at_completion is None else _round_money(estimate_at_completion)
         ),
         variance_at_completion=variance_at_completion,
         cost_status=classify_cost(earned_value, actual_cost),
         schedule_status=classify_schedule(earned_value, planned_value),
+        cost_band=classify_band(cost_performance_index),
+        schedule_band=classify_band(schedule_performance_index),
     )
 
 

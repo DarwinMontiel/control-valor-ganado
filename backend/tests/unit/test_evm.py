@@ -12,7 +12,7 @@ from hypothesis import strategies as st
 
 from app.domain.errors import InvalidActivityError
 from app.domain.evm import ActivityProgress, calculate_activity_indicators, consolidate
-from app.domain.status import CostStatus, ScheduleStatus
+from app.domain.status import CostStatus, PerformanceBand, ScheduleStatus, classify_band
 
 
 def activity(bac: str, planned: str, actual: str, cost: str) -> ActivityProgress:
@@ -219,3 +219,35 @@ class TestProperties:
         if result.estimate_at_completion is not None:
             exact = result.budget_at_completion * result.actual_cost / result.earned_value
             assert abs(result.estimate_at_completion - exact) <= Decimal("0.005")
+
+
+class TestPerformanceBand:
+    """Mi decisión: una desviación desfavorable de hasta el 5 % se ve como "en línea"."""
+
+    @pytest.mark.parametrize(
+        ("index", "band"),
+        [
+            (None, PerformanceBand.NOT_AVAILABLE),
+            ("0.9499", PerformanceBand.UNFAVORABLE),
+            ("0.95", PerformanceBand.WITHIN_TOLERANCE),
+            ("0.99", PerformanceBand.WITHIN_TOLERANCE),
+            ("1.0000", PerformanceBand.FAVORABLE),
+            ("1.03", PerformanceBand.FAVORABLE),
+        ],
+    )
+    def test_band_limits(self, index: str | None, band: PerformanceBand) -> None:
+        assert classify_band(None if index is None else Decimal(index)) is band
+
+    def test_small_overrun_is_within_tolerance_but_still_over_budget(self) -> None:
+        result = calculate_activity_indicators(activity("1000", "50", "50", "505"))
+
+        assert result.cost_performance_index == Decimal("0.9901")
+        assert result.cost_status is CostStatus.OVER_BUDGET
+        assert result.cost_band is PerformanceBand.WITHIN_TOLERANCE
+
+    def test_reference_project_bands(self) -> None:
+        result = consolidate([DESIGN, DEVELOPMENT, TESTING])
+
+        # |0,9474 − 1| = 0,0526: queda justo fuera del 5 %.
+        assert result.cost_band is PerformanceBand.UNFAVORABLE
+        assert result.schedule_band is PerformanceBand.UNFAVORABLE

@@ -12,6 +12,15 @@ class CostStatus(StrEnum):
     NOT_CALCULABLE = "NOT_CALCULABLE"
 
 
+class PerformanceBand(StrEnum):
+    """Lectura de un índice con margen de tolerancia, para el semáforo."""
+
+    FAVORABLE = "FAVORABLE"
+    WITHIN_TOLERANCE = "WITHIN_TOLERANCE"
+    UNFAVORABLE = "UNFAVORABLE"
+    NOT_AVAILABLE = "NOT_AVAILABLE"
+
+
 class ScheduleStatus(StrEnum):
     AHEAD = "AHEAD"
     ON_SCHEDULE = "ON_SCHEDULE"
@@ -37,6 +46,23 @@ SCHEDULE_STATUS_MESSAGES: dict[ScheduleStatus, str] = {
 }
 
 _ZERO = Decimal(0)
+_TARGET_INDEX = Decimal(1)
+
+# Una desviación desfavorable de hasta el 5 % (índice entre 0,95 y 1) se considera "en línea" con
+# el plan. El estado (bajo/sobre presupuesto, adelantado/atrasado) sigue siendo estricto, como en
+# la definición de EVM; la banda solo evita que un 0,99 se vea igual de grave que un 0,60.
+TOLERANCE = Decimal("0.05")
+
+
+def classify_band(index: Decimal | None) -> PerformanceBand:
+    """Banda de un índice CPI o SPI: desde 1 es favorable; de 0,95 a 1, dentro de la tolerancia."""
+    if index is None:
+        return PerformanceBand.NOT_AVAILABLE
+    if index >= _TARGET_INDEX:
+        return PerformanceBand.FAVORABLE
+    if index >= _TARGET_INDEX - TOLERANCE:
+        return PerformanceBand.WITHIN_TOLERANCE
+    return PerformanceBand.UNFAVORABLE
 
 
 def classify_cost(earned_value: Decimal, actual_cost: Decimal) -> CostStatus:
