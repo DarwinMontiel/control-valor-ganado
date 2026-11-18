@@ -14,6 +14,8 @@ export const projectIndicators: Indicators = {
   variance_at_completion: '-1944444.44',
   cost_status: 'OVER_BUDGET',
   schedule_status: 'BEHIND',
+  cost_band: 'UNFAVORABLE',
+  schedule_band: 'UNFAVORABLE',
   cost_interpretation: 'Sobre presupuesto: se está gastando más de lo que se avanza.',
   schedule_interpretation: 'Atrasado: se ha hecho menos trabajo del planeado a la fecha.',
 }
@@ -46,6 +48,8 @@ export const design: Activity = {
     variance_at_completion: '1000000.00',
     cost_status: 'UNDER_BUDGET',
     schedule_status: 'ON_SCHEDULE',
+    cost_band: 'FAVORABLE',
+    schedule_band: 'FAVORABLE',
   },
 }
 
@@ -71,6 +75,8 @@ export const testing: Activity = {
     variance_at_completion: null,
     cost_status: 'NOT_STARTED',
     schedule_status: 'BEHIND',
+    cost_band: 'NOT_AVAILABLE',
+    schedule_band: 'UNFAVORABLE',
   },
 }
 
