@@ -1,0 +1,117 @@
+import type { Activity, Indicators, ProjectDetail } from '../api/types'
+
+/** Respuestas de la API copiadas del proyecto de referencia (docs/EVM_METHODOLOGY.md). */
+export const projectIndicators: Indicators = {
+  budget_at_completion: '35000000.00',
+  planned_value: '23000000.00',
+  earned_value: '18000000.00',
+  actual_cost: '19000000.00',
+  cost_variance: '-1000000.00',
+  schedule_variance: '-5000000.00',
+  cost_performance_index: '0.9474',
+  schedule_performance_index: '0.7826',
+  estimate_at_completion: '36944444.44',
+  variance_at_completion: '-1944444.44',
+  estimate_is_reliable: true,
+  cost_status: 'OVER_BUDGET',
+  schedule_status: 'BEHIND',
+  cost_band: 'UNFAVORABLE',
+  schedule_band: 'UNFAVORABLE',
+  cost_interpretation: 'Sobre presupuesto: se está gastando más de lo que se avanza.',
+  schedule_interpretation: 'Atrasado: se ha hecho menos trabajo del planeado a la fecha.',
+}
+
+const baseActivity = {
+  project_id: 'p1',
+  created_at: '2026-11-17T10:00:00Z',
+  updated_at: '2026-11-17T10:00:00Z',
+}
+
+export const design: Activity = {
+  ...baseActivity,
+  id: 'a1',
+  name: 'Diseño',
+  budget_at_completion: '10000000.00',
+  planned_progress: '100.00',
+  actual_progress: '100.00',
+  actual_cost: '9000000.00',
+  indicators: {
+    ...projectIndicators,
+    budget_at_completion: '10000000.00',
+    planned_value: '10000000.00',
+    earned_value: '10000000.00',
+    actual_cost: '9000000.00',
+    cost_variance: '1000000.00',
+    schedule_variance: '0.00',
+    cost_performance_index: '1.1111',
+    schedule_performance_index: '1.0000',
+    estimate_at_completion: '9000000.00',
+    variance_at_completion: '1000000.00',
+    cost_status: 'UNDER_BUDGET',
+    schedule_status: 'ON_SCHEDULE',
+    cost_band: 'FAVORABLE',
+    schedule_band: 'FAVORABLE',
+  },
+}
+
+export const testing: Activity = {
+  ...baseActivity,
+  id: 'a3',
+  name: 'Pruebas',
+  budget_at_completion: '5000000.00',
+  planned_progress: '20.00',
+  actual_progress: '0.00',
+  actual_cost: '0.00',
+  indicators: {
+    ...projectIndicators,
+    budget_at_completion: '5000000.00',
+    planned_value: '1000000.00',
+    earned_value: '0.00',
+    actual_cost: '0.00',
+    cost_variance: '0.00',
+    schedule_variance: '-1000000.00',
+    cost_performance_index: null,
+    schedule_performance_index: '0.0000',
+    estimate_at_completion: null,
+    variance_at_completion: null,
+    estimate_is_reliable: null,
+    cost_status: 'NOT_STARTED',
+    schedule_status: 'BEHIND',
+    cost_band: 'NOT_AVAILABLE',
+    schedule_band: 'UNFAVORABLE',
+  },
+}
+
+export const referenceProject: ProjectDetail = {
+  id: 'p1',
+  name: 'Portal de clientes',
+  description: null,
+  start_date: '2026-09-01',
+  end_date: null,
+  cutoff_date: '2026-11-17',
+  created_at: '2026-11-17T10:00:00Z',
+  updated_at: '2026-11-17T10:00:00Z',
+  activity_count: 2,
+  indicators: projectIndicators,
+  activities: [design, testing],
+  alerts: [
+    {
+      type: 'COST_OVERRUN',
+      severity: 'MEDIUM',
+      indicator: 'CPI',
+      observed_value: '0.9474',
+      message: 'Por cada peso gastado se obtienen 0,95 pesos de trabajo.',
+      activity_id: null,
+      scope_name: 'Portal de clientes',
+    },
+    {
+      type: 'SCHEDULE_DELAY',
+      severity: 'HIGH',
+      indicator: 'SPI',
+      observed_value: '0.0000',
+      message: 'Se ha completado el 0 % del trabajo que debía estar hecho.',
+      activity_id: 'a3',
+      scope_name: 'Pruebas',
+    },
+  ],
+}

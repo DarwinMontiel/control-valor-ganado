@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+
+/*
+ * Identidad "papel milimetrado de control de obra": papel cálido, tinta cobalto y la cuadrícula
+ * de un plano. Verde, ámbar y rojo se reservan para el estado del proyecto y siempre van con texto.
+ */
+@theme {
+  --font-sans: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --font-mono: 'Cascadia Mono', 'SF Mono', Consolas, monospace;
+
+  --color-paper: #f6f5f1;
+  --color-surface: #ffffff;
+  --color-ink: #16181d;
+  --color-muted: #555b69;
+  --color-line: #dedbd2;
+  --color-grid: #e7e4dc;
+  --color-brand: #1e40af;
+  --color-brand-strong: #172f80;
+  --color-brand-soft: #e6ecfb;
+  --color-good: #166534;
+  --color-good-soft: #e1f3e6;
+  --color-warning: #92400e;
+  --color-warning-soft: #fbefd9;
+  --color-bad: #b91c1c;
+  --color-bad-soft: #fbe4e2;
+  --color-neutral: #555b69;
+  --color-neutral-soft: #ecebe6;
+  --color-series-pv: #8a8f9c;
+  --color-series-ev: #1e40af;
+  --color-series-ac: #d97706;
+}
+
+@layer base {
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-paper: #0f1218;
+      --color-surface: #171b23;
+      --color-ink: #e8eaef;
+      --color-muted: #a3a9b6;
+      --color-line: #2c3240;
+      --color-grid: #1b2029;
+      --color-brand: #93b2ff;
+      --color-brand-strong: #b7cbff;
+      --color-brand-soft: #1b2540;
+      --color-good: #6ee7a0;
+      --color-good-soft: #10291a;
+      --color-warning: #fbbf24;
+      --color-warning-soft: #2d230e;
+      --color-bad: #fca5a5;
+      --color-bad-soft: #351718;
+      --color-neutral: #a3a9b6;
+      --color-neutral-soft: #222733;
+      --color-series-pv: #9aa0ad;
+      --color-series-ev: #93b2ff;
+      --color-series-ac: #f5a524;
+    }
+  }
+
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility graph-paper {
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}

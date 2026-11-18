@@ -1,0 +1,83 @@
+[project]
+name = "valor-ganado-api"
+version = "1.0.0"
+description = "API REST de control de proyectos con Valor Ganado (EVM)"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.163.2",
+  "uvicorn[standard]==0.54.0",
+  "sqlalchemy==2.1.9",
+  "psycopg[binary]==3.3.9",
+  "alembic==1.20.1",
+  "pydantic==2.14.3",
+  "pydantic-settings==2.16.3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==9.2.0",
+  "pytest-cov==7.1.0",
+  "httpx==0.28.1",
+  "hypothesis==6.170.15",
+  "ruff==0.17.5",
+  "mypy==2.4.1",
+]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = ["integration: requiere PostgreSQL"]
+filterwarnings = [
+  # Starlette sugiere migrar su TestClient a httpx2; se mantiene httpx, que es la versión estable.
+  "ignore:Using `httpx` with `starlette.testclient`",
+]
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+skip_covered = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+  "E", "W", "F",   # pycodestyle y pyflakes: errores y variables sin usar
+  "I",             # orden de imports
+  "B",             # bugbear: errores probables
+  "UP",            # sintaxis moderna
+  "SIM",           # simplificaciones
+  "C90",           # complejidad ciclomática
+  "N",             # nombres
+  "ERA",           # código comentado
+  "PLR2004",       # números mágicos
+  "RET", "ARG", "PIE", "PT", "TID",
+]
+
+[tool.ruff.lint.isort]
+known-third-party = ["alembic"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 8
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["PLR2004"]
+"alembic/versions/**" = ["N999"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = []
+files = ["app"]
