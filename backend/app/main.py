@@ -28,7 +28,7 @@ def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(
         title="Valor Ganado API",
-        version="1.0.0",
+        version="1.0.1",
         description=API_DESCRIPTION,
         docs_url="/api-docs",
         redoc_url=None,
