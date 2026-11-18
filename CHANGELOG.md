@@ -1,5 +1,9 @@
 # Cambios
 
+## 1.0.1 · 2026-11-18
+
+- `AI_PROCESS.md`: cómo usé la IA en el proyecto, qué acepté, qué ajusté y cómo verifiqué los números.
+
 ## 1.0.0 · 2026-11-17
 
 Primera entrega.
