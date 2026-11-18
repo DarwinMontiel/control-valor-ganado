@@ -1,5 +1,5 @@
 import type { Indicators } from '../api/types'
-import { formatIndex, formatMoney, formatSignedMoney } from '../lib/format'
+import { UNRELIABLE_ESTIMATE_NOTE, formatIndex, formatMoney, formatSignedMoney } from '../lib/format'
 import { costView, overallHealth, scheduleView, type Tone } from '../lib/status'
 import { toneClasses, toneTextClass } from '../lib/tone'
 import { Badge } from './ui'
@@ -35,15 +35,17 @@ interface FigureProps {
   label: string
   hint: string
   value: string
+  note?: string
 }
 
-function Figure({ label, hint, value }: FigureProps) {
+function Figure({ label, hint, value, note }: FigureProps) {
   return (
     <div className="min-w-0">
       <dt className="text-xs font-medium text-muted" title={hint}>
         {label}
       </dt>
       <dd className="tabular mt-1 truncate text-lg font-semibold">{value}</dd>
+      {note && <dd className="mt-0.5 text-xs font-medium text-warning">{note}</dd>}
     </div>
   )
 }
@@ -89,8 +91,18 @@ export function IndicatorPanel({ indicators }: { indicators: Indicators }) {
         <Figure label="Costo real (AC)" hint="Lo gastado a la fecha de corte" value={formatMoney(indicators.actual_cost)} />
         <Figure label="Variación de costo (CV)" hint="EV − AC" value={formatSignedMoney(indicators.cost_variance)} />
         <Figure label="Variación de cronograma (SV)" hint="EV − PV" value={formatSignedMoney(indicators.schedule_variance)} />
-        <Figure label="Costo estimado final (EAC)" hint="BAC / CPI" value={formatMoney(indicators.estimate_at_completion)} />
-        <Figure label="Desviación final (VAC)" hint="BAC − EAC" value={formatSignedMoney(indicators.variance_at_completion)} />
+        <Figure
+          label="Costo estimado final (EAC)"
+          hint="BAC / CPI"
+          value={formatMoney(indicators.estimate_at_completion)}
+          note={indicators.estimate_is_reliable === false ? UNRELIABLE_ESTIMATE_NOTE : undefined}
+        />
+        <Figure
+          label="Desviación final (VAC)"
+          hint="BAC − EAC"
+          value={formatSignedMoney(indicators.variance_at_completion)}
+          note={indicators.estimate_is_reliable === false ? UNRELIABLE_ESTIMATE_NOTE : undefined}
+        />
       </dl>
     </div>
   )

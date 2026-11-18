@@ -38,6 +38,27 @@ describe('IndicatorPanel', () => {
   })
 })
 
+describe('EAC poco confiable', () => {
+  it('avisa en el panel cuando el avance real es menor al 10 %', () => {
+    render(<IndicatorPanel indicators={{ ...projectIndicators, estimate_is_reliable: false }} />)
+
+    expect(screen.getAllByText(/Poco confiable/)).toHaveLength(2)
+  })
+
+  it('no avisa cuando el EAC es confiable', () => {
+    render(<IndicatorPanel indicators={projectIndicators} />)
+
+    expect(screen.queryByText(/Poco confiable/)).not.toBeInTheDocument()
+  })
+
+  it('marca con asterisco el EAC de la actividad en la tabla', () => {
+    const early = { ...design, indicators: { ...design.indicators, estimate_is_reliable: false } }
+    render(<ActivityTable activities={[early]} onEdit={vi.fn()} onDelete={vi.fn()} />)
+
+    expect(screen.getAllByTitle(/Poco confiable/)).toHaveLength(2)
+  })
+})
+
 describe('ActivityTable', () => {
   it('muestra una fila por actividad con sus indicadores', () => {
     renderTable()
