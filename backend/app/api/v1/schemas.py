@@ -96,6 +96,10 @@ class IndicatorsOut(BaseModel):
     schedule_performance_index: Decimal | None = Field(description="SPI = EV / PV")
     estimate_at_completion: Decimal | None = Field(description="EAC = BAC / CPI")
     variance_at_completion: Decimal | None = Field(description="VAC = BAC − EAC")
+    estimate_is_reliable: bool | None = Field(
+        description="false si el avance real (EV / BAC) es menor al 10 %: el EAC es poco confiable."
+        " null si no hay EAC."
+    )
     cost_status: CostStatus
     schedule_status: ScheduleStatus
     cost_band: PerformanceBand = Field(

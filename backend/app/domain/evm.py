@@ -23,6 +23,9 @@ MIN_PERCENT = Decimal(0)
 MAX_PERCENT = Decimal(100)
 MONEY_QUANTUM = Decimal("0.01")
 INDEX_QUANTUM = Decimal("0.0001")
+# Con menos del 10 % del trabajo hecho, el CPI todavía dice poco: una sola actividad que gastó
+# sin avanzar dispara el EAC. Por debajo de ese avance, el EAC se marca como poco confiable.
+MIN_PROGRESS_FOR_RELIABLE_ESTIMATE = Decimal("0.10")
 _ZERO = Decimal(0)
 
 
@@ -66,6 +69,7 @@ class EvmIndicators:
     schedule_performance_index: Decimal | None
     estimate_at_completion: Decimal | None
     variance_at_completion: Decimal | None
+    estimate_is_reliable: bool | None
     cost_status: CostStatus
     schedule_status: ScheduleStatus
     cost_band: PerformanceBand
@@ -133,6 +137,11 @@ def _build_indicators(
             None if estimate_at_completion is None else _round_money(estimate_at_completion)
         ),
         variance_at_completion=variance_at_completion,
+        estimate_is_reliable=(
+            None
+            if estimate_at_completion is None
+            else earned_value / budget_at_completion >= MIN_PROGRESS_FOR_RELIABLE_ESTIMATE
+        ),
         cost_status=classify_cost(earned_value, actual_cost),
         schedule_status=classify_schedule(earned_value, planned_value),
         cost_band=classify_band(cost_performance_index),

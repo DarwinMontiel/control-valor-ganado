@@ -21,6 +21,7 @@ INDICATOR_KEYS = {
     "schedule_performance_index",
     "estimate_at_completion",
     "variance_at_completion",
+    "estimate_is_reliable",
     "cost_status",
     "schedule_status",
     "cost_band",

@@ -251,3 +251,34 @@ class TestPerformanceBand:
         # |0,9474 − 1| = 0,0526: queda justo fuera del 5 %.
         assert result.cost_band is PerformanceBand.UNFAVORABLE
         assert result.schedule_band is PerformanceBand.UNFAVORABLE
+
+
+class TestEstimateReliability:
+    """Mi decisión: con menos del 10 % de avance real, el EAC se marca como poco confiable."""
+
+    def test_reference_project_estimate_is_reliable(self) -> None:
+        # EV / BAC = 18 M / 35 M = 51 %.
+        assert consolidate([DESIGN, DEVELOPMENT, TESTING]).estimate_is_reliable is True
+
+    def test_mobile_app_estimate_is_not_reliable(self) -> None:
+        # Datos demo "App móvil de pedidos": EV / BAC = 2 M / 32 M = 6,25 %, EAC 44,8 M.
+        result = consolidate(
+            [
+                activity("6000000", "30", "30", "0"),
+                activity("15000000", "20", "0", "2500000"),
+                activity("2000000", "0", "10", "300000"),
+                activity("9000000", "0", "0", "0"),
+            ]
+        )
+
+        assert result.estimate_at_completion == Decimal("44800000.00")
+        assert result.estimate_is_reliable is False
+
+    @pytest.mark.parametrize(("actual", "reliable"), [("9.99", False), ("10", True)])
+    def test_limit_is_ten_percent_inclusive(self, actual: str, reliable: bool) -> None:
+        result = calculate_activity_indicators(activity("1000", "50", actual, "100"))
+
+        assert result.estimate_is_reliable is reliable
+
+    def test_no_estimate_means_no_reliability(self) -> None:
+        assert calculate_activity_indicators(TESTING).estimate_is_reliable is None
