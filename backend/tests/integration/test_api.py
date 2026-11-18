@@ -23,6 +23,8 @@ INDICATOR_KEYS = {
     "variance_at_completion",
     "cost_status",
     "schedule_status",
+    "cost_band",
+    "schedule_band",
     "cost_interpretation",
     "schedule_interpretation",
 }

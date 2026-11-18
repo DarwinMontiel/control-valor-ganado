@@ -1,6 +1,6 @@
 /** Traduce los estados que calcula la API a tono visual y texto corto. */
 
-import type { CostStatus, Indicators, ScheduleStatus } from '../api/types'
+import type { CostStatus, Indicators, PerformanceBand, ScheduleStatus } from '../api/types'
 
 export type Tone = 'good' | 'warning' | 'bad' | 'neutral'
 
@@ -24,11 +24,20 @@ export const SCHEDULE_STATUS_VIEW: Record<ScheduleStatus, StatusView> = {
   NOT_STARTED: { label: 'Sin iniciar', tone: 'neutral' },
 }
 
+const WITHIN_TOLERANCE_VIEW: StatusView = { label: 'En línea', tone: 'warning' }
+
+/**
+ * Semáforo de un índice. Si la API dice que está dentro de la tolerancia (±5 %), se muestra en
+ * amarillo como "En línea"; si no, manda el estado estricto (bajo/sobre presupuesto, etc.).
+ */
+const withBand = (band: PerformanceBand, strict: StatusView): StatusView =>
+  band === 'WITHIN_TOLERANCE' ? WITHIN_TOLERANCE_VIEW : strict
+
 export const costView = (indicators: Indicators): StatusView =>
-  COST_STATUS_VIEW[indicators.cost_status]
+  withBand(indicators.cost_band, COST_STATUS_VIEW[indicators.cost_status])
 
 export const scheduleView = (indicators: Indicators): StatusView =>
-  SCHEDULE_STATUS_VIEW[indicators.schedule_status]
+  withBand(indicators.schedule_band, SCHEDULE_STATUS_VIEW[indicators.schedule_status])
 
 export interface HealthView {
   tone: Tone
@@ -42,8 +51,11 @@ export function overallHealth(indicators: Indicators): HealthView {
   if (badCount === tones.length) {
     return { tone: 'bad', title: 'En riesgo: sobrecosto y retraso' }
   }
-  if (badCount > 0 || tones.includes('warning')) {
+  if (badCount > 0 || indicators.cost_status === 'NOT_CALCULABLE') {
     return { tone: 'warning', title: 'Requiere atención' }
+  }
+  if (tones.includes('warning')) {
+    return { tone: 'warning', title: 'En línea, con desviaciones menores' }
   }
   if (tones.every((tone) => tone === 'neutral')) {
     return { tone: 'neutral', title: 'Sin avance registrado' }

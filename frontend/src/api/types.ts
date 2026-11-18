@@ -11,6 +11,8 @@ export type CostStatus =
 
 export type ScheduleStatus = 'AHEAD' | 'ON_SCHEDULE' | 'BEHIND' | 'NOT_STARTED'
 
+export type PerformanceBand = 'FAVORABLE' | 'WITHIN_TOLERANCE' | 'UNFAVORABLE' | 'NOT_AVAILABLE'
+
 export interface Indicators {
   budget_at_completion: DecimalString
   planned_value: DecimalString
@@ -24,6 +26,8 @@ export interface Indicators {
   variance_at_completion: DecimalString | null
   cost_status: CostStatus
   schedule_status: ScheduleStatus
+  cost_band: PerformanceBand
+  schedule_band: PerformanceBand
   cost_interpretation: string
   schedule_interpretation: string
 }

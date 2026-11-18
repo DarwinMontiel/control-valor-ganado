@@ -20,6 +20,7 @@ from app.domain.status import (
     COST_STATUS_MESSAGES,
     SCHEDULE_STATUS_MESSAGES,
     CostStatus,
+    PerformanceBand,
     ScheduleStatus,
 )
 from app.infrastructure.models import NAME_MAX_LENGTH
@@ -97,6 +98,12 @@ class IndicatorsOut(BaseModel):
     variance_at_completion: Decimal | None = Field(description="VAC = BAC − EAC")
     cost_status: CostStatus
     schedule_status: ScheduleStatus
+    cost_band: PerformanceBand = Field(
+        description="Semáforo del CPI: ≥ 1 favorable; 0,95 a 1 en tolerancia; < 0,95 desfavorable."
+    )
+    schedule_band: PerformanceBand = Field(
+        description="Semáforo del SPI: ≥ 1 favorable; 0,95 a 1 en tolerancia; < 0,95 desfavorable."
+    )
 
     @computed_field  # type: ignore[prop-decorator]
     @property
