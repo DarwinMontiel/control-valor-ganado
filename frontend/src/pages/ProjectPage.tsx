@@ -104,7 +104,7 @@ function ProjectView({ project }: { project: ProjectDetail }) {
       </Card>
 
       <Card>
-        <SectionTitle hint="Montos en pesos colombianos. “—” = no calculable.">
+        <SectionTitle hint="Montos en pesos colombianos. “—” = no calculable. * = EAC poco confiable (avance real < 10 %).">
           Actividades
         </SectionTitle>
         <div className="mb-4 flex justify-end">

@@ -24,6 +24,7 @@ export interface Indicators {
   schedule_performance_index: DecimalString | null
   estimate_at_completion: DecimalString | null
   variance_at_completion: DecimalString | null
+  estimate_is_reliable: boolean | null
   cost_status: CostStatus
   schedule_status: ScheduleStatus
   cost_band: PerformanceBand

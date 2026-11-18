@@ -6,6 +6,7 @@
 import type { DecimalString } from '../api/types'
 
 export const NOT_AVAILABLE = '—'
+export const UNRELIABLE_ESTIMATE_NOTE = 'Poco confiable: el avance real es menor al 10 %.'
 const LOCALE = 'es-CO'
 const INDEX_DECIMALS = 2
 const PERCENT_DECIMALS = 0

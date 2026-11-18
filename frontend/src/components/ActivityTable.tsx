@@ -1,7 +1,14 @@
 import { useMemo, useState } from 'react'
 
 import type { Activity, DecimalString } from '../api/types'
-import { formatIndex, formatMoney, formatPercent, formatSignedMoney, toNumber } from '../lib/format'
+import {
+  UNRELIABLE_ESTIMATE_NOTE,
+  formatIndex,
+  formatMoney,
+  formatPercent,
+  formatSignedMoney,
+  toNumber,
+} from '../lib/format'
 import { costView, scheduleView } from '../lib/status'
 import { Badge, Button } from './ui'
 
@@ -12,7 +19,11 @@ interface Column {
   value: (activity: Activity) => DecimalString | null
   format: (value: DecimalString | null) => string
   signed?: boolean
+  unreliable?: (activity: Activity) => boolean
 }
+
+const hasUnreliableEstimate = (activity: Activity) =>
+  activity.indicators.estimate_is_reliable === false
 
 const COLUMNS: Column[] = [
   { key: 'bac', label: 'BAC', title: 'Presupuesto total', value: (a) => a.budget_at_completion, format: formatMoney },
@@ -25,8 +36,8 @@ const COLUMNS: Column[] = [
   { key: 'sv', label: 'SV', title: 'Variación de cronograma (EV − PV)', value: (a) => a.indicators.schedule_variance, format: formatSignedMoney, signed: true },
   { key: 'cpi', label: 'CPI', title: 'EV / AC', value: (a) => a.indicators.cost_performance_index, format: formatIndex },
   { key: 'spi', label: 'SPI', title: 'EV / PV', value: (a) => a.indicators.schedule_performance_index, format: formatIndex },
-  { key: 'eac', label: 'EAC', title: 'Costo estimado al terminar (BAC / CPI)', value: (a) => a.indicators.estimate_at_completion, format: formatMoney },
-  { key: 'vac', label: 'VAC', title: 'Desviación al terminar (BAC − EAC)', value: (a) => a.indicators.variance_at_completion, format: formatSignedMoney, signed: true },
+  { key: 'eac', label: 'EAC', title: 'Costo estimado al terminar (BAC / CPI)', value: (a) => a.indicators.estimate_at_completion, format: formatMoney, unreliable: hasUnreliableEstimate },
+  { key: 'vac', label: 'VAC', title: 'Desviación al terminar (BAC − EAC)', value: (a) => a.indicators.variance_at_completion, format: formatSignedMoney, signed: true, unreliable: hasUnreliableEstimate },
 ]
 
 type SortState = { key: string; direction: 'asc' | 'desc' } | null
@@ -122,6 +133,11 @@ export function ActivityTable({ activities, onEdit, onDelete }: ActivityTablePro
                 return (
                   <td key={column.key} className={`whitespace-nowrap px-2 py-3 text-right ${signClass(column, value)}`}>
                     {column.format(value)}
+                    {column.unreliable?.(activity) && (
+                      <span title={UNRELIABLE_ESTIMATE_NOTE} className="ml-0.5 text-warning">
+                        *<span className="sr-only"> {UNRELIABLE_ESTIMATE_NOTE}</span>
+                      </span>
+                    )}
                   </td>
                 )
               })}
